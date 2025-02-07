@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+
+<body class="bg-white">
+
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between px-4 py-2 bg-white shadow-md fixed w-full top-0 z-10">
+        <div class="flex items-center space-x-4">
+            <button id="menu-btn" class="hover:bg-gray-100 p-2 rounded md:hidden">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" alt="YouTube Logo" class="h-6">
+        </div>
+        <div class="flex items-center w-full md:w-1/2 space-x-2">
+            <input id="search" type="text" placeholder="Search" class="w-full border border-gray-300 rounded-l-full py-2 px-4 focus:outline-none focus:ring-1 focus:ring-blue-500">
+            <button onclick="searchVideos()" class="bg-gray-200 border border-gray-300 px-4 py-2 rounded-r-full text-gray-600">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <button class="p-2 ml-2 rounded-full text-black hover:opacity-75">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button class="p-2 rounded-full hover:bg-gray-100 hidden md:inline">⋮</button>
+
+            <button class="p-2 text-blue-500 border border-blue-500 rounded-full hover:bg-blue-500 hover:text-white">
+                <i class="fa-solid fa-circle-user"></i>
+                <span class="hidden sm:inline">Sign in</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed left-0 top-14 w-20 md:w-24 h-full bg-white border-r hidden md:flex flex-col items-center space-y-6 pt-6 transition-transform transform -translate-x-full md:translate-x-0">
+        <a href="#" class="flex flex-col items-center text-black hover:text-black">
+            <i class="fa-solid fa-house"></i>
+            <span class="text-xs">Home</span>
+        </a>
+        <a href="#" class="flex flex-col items-center text-black hover:text-black">
+            <i class="fa-solid fa-bolt"></i>
+            <span class="text-xs">Shorts</span>
+        </a>
+        <a href="#" class="flex flex-col items-center text-black hover:text-black">
+            <span><i class="fa-solid fa-tv"></i></span>
+            <span class="text-xs">Subscriptions</span>
+        </a>
+        <a href="#" class="flex flex-col items-center text-black hover:text-black">
+            <span><i class="fa-solid fa-user"></i></span>
+            <span class="text-xs">You</span>
+        </a>
+        <a href="#" class="flex flex-col items-center text-black hover:text-black">
+            <span><i class="fa-duotone fa-regular fa-clock"></i></span>
+            <span class="text-xs">History</span>
+        </a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex flex-col items-center justify-top min-h-screen text-center px-6 pt-20 py-4 p-5 md:ml-24">
+        <div class="max-w-lg bg-gray-100 px-4 py-3 rounded-lg shadow-lg w-full md:w-1/2">
+            <h1 class="text-xl font-bold">Try searching to get started</h1>
+            <p class="text-gray-500 text-xs">Start watching videos to help us build a feed of videos you'll love.</p>
+        </div>
+        <div id="videos" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4 w-full px-4"></div>
+    </main>
+
+    <script>
+        document.getElementById('menu-btn').addEventListener('click', function () {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        });
+
+        const API_KEY = 'AIzaSyCQJ7gP7RM1gU1X81rlcv9CiSuHWscAEK4';
+
+        async function searchVideos() {
+            const query = document.getElementById('search').value;
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=9&key=${API_KEY}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                displayVideos(data.items);
+            } catch (error) {
+                console.error("Error fetching videos:", error);
+            }
+        }
+
+        function displayVideos(videos) {
+            const videosContainer = document.getElementById('videos');
+            videosContainer.innerHTML = '';
+            videos.forEach(video => {
+                const videoElement = document.createElement('div');
+                videoElement.classList.add('bg-gray-800', 'p-4', 'rounded', 'shadow-lg', 'text-white');
+                videoElement.innerHTML = `
+                    <img src="${video.snippet.thumbnails.medium.url}" class="w-full rounded">
+                    <h2 class="mt-2 text-lg font-bold">${video.snippet.title}</h2>
+                    <p class="text-sm text-gray-400">${video.snippet.channelTitle}</p>
+                    <a href="https://www.youtube.com/watch?v=${video.id.videoId}" target="_blank" class="block bg-red-500 mt-2 p-2 rounded text-center text-white">Watch</a>
+                `;
+                videosContainer.appendChild(videoElement);
+            });
+        }
+    </script>
+</body>
+
+</html>
